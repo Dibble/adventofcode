@@ -1,4 +1,3 @@
-import { dir } from 'console'
 import * as fs from 'fs'
 
 // const file = fs.readFileSync('test.txt', 'utf8')
