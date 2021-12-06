@@ -10,9 +10,9 @@
       "request": "launch",
       "preLaunchTask": "build",
       // If you have changed target frameworks, make sure to update the program path.
-      "program": "${workspaceFolder}/1/bin/Debug/net6.0/1.dll",
+      "program": "${workspaceFolder}/5/bin/Debug/net6.0/5.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/1",
+      "cwd": "${workspaceFolder}/5",
       // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
       "console": "internalConsole",
       "stopAtEntry": false
