@@ -51,8 +51,31 @@
                     {
                         continue;
                     }
+                    // Console.WriteLine(string.Join(',', path));
 
-                    var nextCaves = links[path.Last()].Where(cave => cave.ToCharArray().All(c => char.IsUpper(c)) || !path.Contains(cave)).ToList();
+                    
+                    var smallCaveVisitedTwice = path.Where(p => !char.IsUpper(p, 0)).Distinct().Any(c => path.Count(x => x == c) > 1);
+
+                    var nextCaves = links[path.Last()].Where(cave =>
+                    {
+                        if (cave == "start")
+                        {
+                            return false;
+                        }
+
+                        if (cave == "end")
+                        {
+                            return true;
+                        }
+
+                        var bigCave = char.IsUpper(cave, 0);
+                        if (bigCave)
+                        {
+                            return true;
+                        }
+
+                        return !smallCaveVisitedTwice || !path.Contains(cave);
+                    }).ToList();
                     // TODO prevent infinite loops between big caves
 
                     if (nextCaves.Count > 1)
@@ -79,7 +102,9 @@
                 }
             }
 
-            Console.WriteLine(paths.Where(path => !path.Contains("dead")).Count());
+            var validPaths = paths.Where(path => !path.Contains("dead"));
+            Console.WriteLine(validPaths.Count());
+            // validPaths.ToList().ForEach(path => Console.WriteLine(string.Join(',', path)));
         }
     }
 }
