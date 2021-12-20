@@ -47,13 +47,48 @@
 
         static void Main(string[] args)
         {
-            using var sr = new StreamReader("test2.txt");
+            using var sr = new StreamReader("input.txt");
 
             var file = sr.ReadToEnd();
             var lines = file.Split("\n").ToList();
 
-            var grid = lines.Select(l => l.ToCharArray().Select(c => int.Parse(c.ToString())).ToArray()).ToArray();
-            // TODO expand grid by 5
+            // var grid = lines.Select(l => l.ToCharArray().Select(c => int.Parse(c.ToString())).ToArray()).ToArray();
+            var expandedLines = new List<string>(lines);
+
+            for (int i = 1; i < 5; i++)
+            {
+                for (int j = 0; j < expandedLines.Count; j++)
+                {
+                    expandedLines[j] += string.Join(string.Empty, lines[j].ToCharArray().Select(c =>
+                    {
+                        var newVal = int.Parse(c.ToString()) + i;
+                        if (newVal > 9)
+                        {
+                            newVal -= 9;
+                        }
+                        return newVal;
+                    }));
+                }
+            }
+
+            for (int i = 1; i < 5; i++)
+            {
+                for (int j = 0; j < lines.Count; j++)
+                {
+                    var newLine = string.Join(string.Empty, expandedLines[j].ToCharArray().Select(c =>
+                    {
+                        var newVal = int.Parse(c.ToString()) + i;
+                        if (newVal > 9)
+                        {
+                            newVal -= 9;
+                        }
+                        return newVal;
+                    }));
+                    expandedLines.Add(newLine);
+                }
+            }
+
+            var grid = expandedLines.Select(l => l.ToCharArray().Select(c => int.Parse(c.ToString())).ToArray()).ToArray();
 
             var goal = new Position(grid.Length - 1, grid[0].Length - 1);
 
@@ -62,10 +97,12 @@
                 { goal, 0 }
             };
 
+            var iterations = 0;
             var changes = false;
             while (minsGrid.Count < grid.Length * grid[0].Length || changes)
             {
-                Console.WriteLine($"{minsGrid.Count} {changes}");
+                iterations++;
+                Console.WriteLine($"{minsGrid.Count} {changes} {iterations}");
                 changes = false;
 
                 for (int x = goal.x; x >= 0; x--)
@@ -82,14 +119,14 @@
                             if (newMin < minsGrid[new Position(x, y)])
                             {
                                 minsGrid[new Position(x, y)] = newMin;
-                                Console.WriteLine($"updating {x},{y} = {newMin} ({minsGrid[new Position(x, y)]})");
+                                // Console.WriteLine($"updating {x},{y} = {newMin} ({minsGrid[new Position(x, y)]})");
                                 changes = true;
                             }
                         }
                         else
                         {
                             minsGrid.Add(new Position(x, y), min);
-                            Console.WriteLine($"adding {x},{y} = {min}");
+                            // Console.WriteLine($"adding {x},{y} = {min}");
                             changes = true;
                         }
                     }
