@@ -16,14 +16,16 @@ namespace AdventOfCode16
             return bin;
         }
 
-        static (int, IEnumerable<string>) ProcessNextPacket (IEnumerable<string> binary)
+        static (long, IEnumerable<string>) ProcessNextPacket (IEnumerable<string> binary)
         {
             if (!binary.Any())
             {
                 return (0, new List<string>());
             }
 
-            var versionSum = 0;
+            // var versionSum = 0;
+            var result = 0L;
+            var literalValue = string.Empty;
             var step = "version";
 
             var digits = binary.First();
@@ -32,16 +34,20 @@ namespace AdventOfCode16
             char operatorLengthType = default;
 
             var processing = true;
-            while (processing)
+            while (processing && remaining.Any())
             {
-                Console.Write($"{step}: ");
                 switch (step)
                 {
                     case "version":
-                        var version = Convert.ToInt32(digits[0..3], 2);
-                        versionSum += version;
+                        while (digits.Length < 3)
+                        {
+                            digits += remaining.First();
+                            remaining = remaining.Skip(1);
+                        }
+                        // var version = Convert.ToInt32(digits[0..3], 2);
+                        // versionSum += version;
                         step = "type";
-                        Console.Write($"{version} {digits[0..3]}");
+
                         digits = digits[3..];
                         break;
                     case "type":
@@ -52,8 +58,19 @@ namespace AdventOfCode16
                         }
 
                         var type = Convert.ToInt32(digits[0..3], 2);
-                        step = type == 4 ? "literal" : "operator";
-                        Console.Write($"{type} {digits[0..3]}");
+                        step = type switch
+                        {
+                            0 => "sum",
+                            1 => "product",
+                            2 => "minimum",
+                            3 => "maximum",
+                            4 => "literal",
+                            5 => "greater",
+                            6 => "less",
+                            7 => "equal",
+                            _ => throw new Exception($"Unknown packet type {type}")
+                        };
+
                         digits = digits[3..];
                         break;
                     case "literal":
@@ -63,15 +80,23 @@ namespace AdventOfCode16
                             remaining = remaining.Skip(1);
                         }
 
+                        literalValue += digits[1..5];
                         var last = digits[0] == '0';
-                        Console.Write($"{digits[0..5]} {last}");
                         if (last)
                         {
+                            result = Convert.ToInt64(literalValue, 2);
                             processing = false;
                         }
                         digits = digits[5..];
                         break;
-                    case "operator":
+                    case "sum":
+                    case "product":
+                    case "minimum":
+                    case "maximum":
+                    case "greater":
+                    case "less":
+                    case "equal":
+                        var subPacketResults = new List<long>();
                         switch (operatorLengthType)
                         {
                             case default(char):
@@ -81,7 +106,8 @@ namespace AdventOfCode16
                                     remaining = remaining.Skip(1);
                                 }
                                 operatorLengthType = digits[0];
-                                Console.Write(operatorLengthType.ToString());
+                                digits = digits[1..];
+
                                 break;
                             case '0':
                                 while (digits.Length < 15)
@@ -98,8 +124,22 @@ namespace AdventOfCode16
                                 }
 
                                 string bits = digits[0..length];
-                                var subPacket = ProcessNextPacket(new List<string>{ bits });
-                                versionSum += subPacket.Item1;
+                                digits = digits[length..];
+                                var subPacketBits = new List<string>();
+                                for (int i = 0; i < bits.Length; i+=4)
+                                {
+                                    var end = i+4 < bits.Length ? i+4 : ^0;
+                                    subPacketBits.Add(bits[i..end]);
+                                }
+                                var subPacket = ProcessNextPacket(subPacketBits);
+                                subPacketResults.Add(subPacket.Item1);
+
+                                while (subPacket.Item2.Any())
+                                {
+                                    subPacket = ProcessNextPacket(subPacket.Item2);
+                                    subPacketResults.Add(subPacket.Item1);
+                                }
+
                                 processing = false;
                                 break;
                             case '1':
@@ -113,33 +153,64 @@ namespace AdventOfCode16
 
                                 for (int i = 0; i < packets; i++)
                                 {
-                                    var result = ProcessNextPacket(new List<string> { digits }.Concat(remaining));
-                                    versionSum += result.Item1;
-                                    remaining = result.Item2;
+                                    var packetResult = ProcessNextPacket(new List<string> { digits }.Concat(remaining));
+                                    subPacketResults.Add(packetResult.Item1);
+                                    remaining = packetResult.Item2;
                                     digits = string.Empty;
                                 }
 
                                 processing = false;
                                 break;
                         }
+
+                        if (subPacketResults.Any())
+                        {
+                            switch (step)
+                            {
+                                case "sum":
+                                    result = subPacketResults.Sum();
+                                    break;
+                                case "product":
+                                    result = subPacketResults.Aggregate(1L, (acc, next) => acc * next);
+                                    break;
+                                case "minimum":
+                                    result = subPacketResults.Min();
+                                    break;
+                                case "maximum":
+                                    result = subPacketResults.Max();
+                                    break;
+                                case "greater":
+                                    result = subPacketResults[0] > subPacketResults[1] ? 1 : 0;
+                                    break;
+                                case "less":
+                                    result = subPacketResults[0] < subPacketResults[1] ? 1 : 0;
+                                    break;
+                                case "equal":
+                                    result = subPacketResults[0] == subPacketResults[1] ? 1 : 0;
+                                    break;
+                            }
+                        }
                         break;
                 }
-                Console.WriteLine();
             }
 
-            return (versionSum, remaining);
+            if (digits.Length > 0)
+            {
+                remaining = remaining.Prepend(digits);
+            }
+            return (result, remaining);
         }
 
         static void Main(string[] args)
         {
-            using var sr = new StreamReader("test.txt");
+            using var sr = new StreamReader("input.txt");
 
             var file = sr.ReadToEnd();
             var lines = file.Split("\n").ToList();
 
             var input = lines[0];
             var binary = input.ToCharArray().Select(c => HexStringToBinary(c));
-            Console.WriteLine(string.Join(' ', binary));
+            // Console.WriteLine(string.Join(' ', binary));
 
             var processed = ProcessNextPacket(binary);
             Console.WriteLine(processed.Item1);
