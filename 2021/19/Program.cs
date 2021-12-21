@@ -4,6 +4,57 @@ namespace AdventOfCode19
 {
     class Program
     {
+        // orientations:
+        // x,y,z
+        // -x,y,z
+        // x,-y,z
+        // x,y,-z
+        // -x,-y,z
+        // x,-y,-z
+        // -x,y,-z
+        // -x,-y,-z
+        // y,x,z
+        // -y,x,z
+        // y,-x,z
+        // y,x,-z
+        // -y,-x,z
+        // y,-x,-z
+        // -y,x,-z
+        // -y,-x,-z
+        // z,x,y
+        // -z,x,y
+        // z,-x,y
+        // z,x,-y
+        // -z,-x,y
+        // z,-x,-y
+        // -z,x,-y
+        // -z,-x,-y
+        // x,z,y
+        // -x,z,y
+        // x,-z,y
+        // x,z,-y
+        // -x,-z,y
+        // x,-z,-y
+        // -x,z,-y
+        // -x,-z,-y
+        // y,z,x
+        // -y,z,x
+        // y,-z,x
+        // y,z,-x
+        // -y,-z,x
+        // y,-z,-x
+        // -y,z,-x
+        // -y,-z,-x
+        // z,y,x
+        // -z,y,x
+        // z,-y,x
+        // z,y,-x
+        // -z,-y,x
+        // z,-y,-x
+        // -z,y,-x
+        // -z,-y,-x
+        
+
         static void Main(string[] args)
         {
             using var sr = new StreamReader("test.txt");
