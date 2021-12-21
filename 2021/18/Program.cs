@@ -4,26 +4,61 @@
     {
         static void Main(string[] args)
         {
-            using var sr = new StreamReader("test2.txt");
+            using var sr = new StreamReader("input.txt");
 
             var file = sr.ReadToEnd();
             var lines = file.Split("\n").ToList();
 
-            // var snails = lines.Select(line => ParseInput(line)).ToList();
-            // var sum = snails.Aggregate((acc, next) => acc == null ? next : acc.Add(next));
-            // Console.WriteLine(sum.Magnitude);
-
-            var sum = lines.Aggregate((acc, next) =>
+            var largestSum = 0;
+            for (int i = 0; i < lines.Count; i++)
             {
-                if (acc == null)
+                for (int j = 0; j < lines.Count; j++)
                 {
-                    return next;
+                    if (i == j)
+                    {
+                        continue;
+                    }
+                    var sum = GetMagnitude(Reduce(Add(lines[i], lines[j])));
+                    largestSum = Math.Max(sum, largestSum);
                 }
+            }
 
-                var added = Add(acc, next);
-                return Reduce(added);
-            });
-            Console.WriteLine(sum);
+            Console.WriteLine(largestSum);
+
+            // var sum = lines.Aggregate((acc, next) =>
+            // {
+            //     if (acc == null)
+            //     {
+            //         return next;
+            //     }
+
+            //     var added = Add(acc, next);
+            //     return Reduce(added);
+            // });
+            // Console.WriteLine(sum);
+            // Console.WriteLine(GetMagnitude(sum));
+        }
+
+        static int GetMagnitude (string input)
+        {
+            var output = input;
+            while (output.Contains('['))
+            {
+                var charList = output.ToCharArray().ToList();
+                var startPair = charList.FindLastIndex(c => c == '[');
+                var endPair = charList.FindIndex(startPair + 1, c => c == ']');
+                var pair = output[(startPair+1)..endPair];
+                var s = pair.Split(',');
+                var left = int.Parse(s[0]);
+                var right = int.Parse(s[1]);
+                var magnitude = left * 3 + right * 2;
+
+                var beginning = startPair > 0 ? output[0..startPair] : string.Empty;
+                var ending = endPair < output.Length - 1 ? output[(endPair+1)..] : string.Empty;
+                output = $"{beginning}{magnitude}{ending}";
+            }
+
+            return int.Parse(output);
         }
 
         static string Reduce (string input)
@@ -81,7 +116,7 @@
                                 var firstLeftValStart = output.ToCharArray().ToList().FindLastIndex(firstLeftIdx, c => c == '[' || c == ']' || c == ',');
                                 var firstLeftVal = output[(firstLeftValStart+1)..(firstLeftIdx+1)];
                                 var newLeft = int.Parse(firstLeftVal) + leftVal;
-                                output = $"{output[0..firstLeftIdx]}{newLeft}{output[(firstLeftIdx+1)..]}";
+                                output = $"{output[0..(firstLeftValStart+1)]}{newLeft}{output[(firstLeftIdx+1)..]}";
 
                                 var stringLengthDiff = $"{newLeft}".Length - firstLeftVal.Length;
                                 commaIdx += stringLengthDiff;
@@ -195,204 +230,5 @@
         {
             return $"[{num1},{num2}]";
         }
-
-        // static SnailNumber ParseInput(string line)
-        // {
-        //     var idx = 0;
-        //     SnailNumber currentSnail = null;
-
-        //     while (idx < line.Length)
-        //     {
-        //         var nextChar = line[idx];
-
-        //         switch (nextChar)
-        //         {
-        //             case '[':
-        //                 var newSnail = new SnailNumber(currentSnail, null, null, null, null);
-                        
-        //                 if (currentSnail != null)
-        //                 {
-        //                     currentSnail._leftSnail = newSnail;
-        //                 }
-        //                 currentSnail = newSnail;
-        //                 break;
-        //             case ']':
-        //                 if (currentSnail._parent == null)
-        //                 {
-        //                     break;
-        //                 }
-
-        //                 // set current as left or right (if left already set) on parent
-        //                 if (currentSnail._parent._leftSnail == currentSnail)
-        //                 {
-        //                     currentSnail._parent._rightSnail = currentSnail;
-        //                 }
-        //                 else
-        //                 {
-        //                     currentSnail._parent._leftSnail = currentSnail;
-        //                 }
-        //                 // set current to parent
-        //                 currentSnail = currentSnail._parent;
-        //                 break;
-        //             case ',':
-        //                 // do nothing
-        //                 break;
-        //             default:
-        //                 // parse number
-        //                 var num = int.Parse(nextChar.ToString());
-        //                 // set on current as left or right (if left already set)
-        //                 if (currentSnail._left == null)
-        //                 {
-        //                     currentSnail._left = num;
-        //                 }
-        //                 else
-        //                 {
-        //                     currentSnail._right = num;
-        //                 }
-        //                 break;
-        //         }
-
-        //         idx++;
-        //     }
-
-        //     while (currentSnail._parent != null)
-        //     {
-        //         currentSnail = currentSnail._parent;
-        //     }
-
-        //     return currentSnail;
-        // }
     }
-
-    // class SnailNumber
-    // {
-    //     public SnailNumber? _parent;
-    //     public SnailNumber? _leftSnail;
-    //     public SnailNumber? _rightSnail;
-    //     public int? _left;
-    //     public int? _right;
-
-    //     public int Magnitude
-    //     { 
-    //         get
-    //         {
-    //             var leftMag = _leftSnail == null ? _left * 3 : _leftSnail.Magnitude * 3;
-    //             var rightMag = _rightSnail == null ? _right * 2 : _rightSnail.Magnitude * 2;
-    //             return leftMag.Value + rightMag.Value;
-    //         }
-    //     }
-
-    //     public SnailNumber(SnailNumber? parent, SnailNumber? leftSnail, SnailNumber? rightSnail, int? left, int? right)
-    //     {
-    //         _parent = parent;
-    //         _leftSnail = leftSnail;
-    //         _rightSnail = rightSnail;
-    //         _left = left;
-    //         _right = right;
-    //     }
-
-    //     public SnailNumber Add(SnailNumber other)
-    //     {
-    //         var newSnail = new SnailNumber(null, this, other, null, null);
-
-    //         var current = newSnail;
-    //         var reduced = true;
-    //         while (reduced || current != newSnail)
-    //         {
-    //             reduced = false;
-
-    //             if (current._parent?._parent?._parent?._parent != null)
-    //             {
-    //                 reduced = true;
-    //                 // explode current pair
-    //                 var leftExplode = current._parent;
-    //                 while (leftExplode._left == null && leftExplode._parent != null)
-    //                 {
-    //                     leftExplode = leftExplode._parent;
-    //                 }
-    //                 if (leftExplode._left != null)
-    //                 {
-    //                     leftExplode._left += current._left;
-    //                 }
-
-    //                 var rightExplode = current._parent;
-    //                 while (rightExplode._right == null && rightExplode._parent != null)
-    //                 {
-    //                     rightExplode = rightExplode._parent;
-    //                 }
-    //                 if (rightExplode._right != null)
-    //                 {
-    //                     rightExplode._right += current._right;
-    //                 }
-
-    //                 if (current._parent._leftSnail == current)
-    //                 {
-    //                     current._parent._left = 0;
-    //                     current._parent._leftSnail = null;
-    //                 }
-    //                 else
-    //                 {
-    //                     current._parent._right = 0;
-    //                     current._parent._rightSnail = null;
-    //                 }
-
-    //                 current = newSnail;
-    //             }
-    //             else if (current._left > 9)
-    //             {
-    //                 reduced = true;
-    //                 // split left
-    //                 var newLeft = Math.Floor(current._left.Value / 2.0);
-    //                 var newRight = Math.Ceiling(current._left.Value / 2.0);
-    //                 var splitSnail = new SnailNumber(current, null, null, (int)newLeft, (int)newRight);
-    //                 current._leftSnail = splitSnail;
-    //                 current._left = null;
-
-    //                 current = newSnail;
-    //             }
-    //             else if (current._right > 9)
-    //             {
-    //                 reduced = true;
-    //                 // split right
-    //                 var newLeft = Math.Floor(current._right.Value / 2.0);
-    //                 var newRight = Math.Ceiling(current._right.Value / 2.0);
-    //                 var splitSnail = new SnailNumber(current, null, null, (int)newLeft, (int)newRight);
-    //                 current._rightSnail = splitSnail;
-    //                 current._right = null;
-
-    //                 current = newSnail;
-    //             }
-
-    //             // select next snail
-    //             if (current._leftSnail != null)
-    //             {
-    //                 current = current._leftSnail;
-    //             }
-    //             else if (current._rightSnail != null)
-    //             {
-    //                 current = current._rightSnail;
-    //             }
-    //             else
-    //             {
-    //                 // go up
-    //                 var nextCurrent = current;
-    //                 while (nextCurrent._rightSnail == null && nextCurrent._parent != null)
-    //                 {
-    //                     nextCurrent = nextCurrent._parent;
-    //                 }
-
-    //                 if (nextCurrent._rightSnail != null)
-    //                 {
-    //                     current = nextCurrent._rightSnail;
-    //                 }
-    //                 else
-    //                 {
-    //                     current = newSnail;
-    //                 }
-    //             }
-    //         }
-
-    //         return newSnail;
-    //     }
-    // }
 }
