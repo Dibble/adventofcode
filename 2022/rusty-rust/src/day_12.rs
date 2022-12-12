@@ -74,7 +74,7 @@ pub fn run(lines: io::Lines<io::BufReader<File>>) {
           for x in 1..filered_routable.len() {
             let mut new_route = route.clone();
             new_route.push(**filered_routable.get(x).unwrap());
-            routes.push(new_route);
+            routes_iter.push(new_route);
           }
         },
       }
