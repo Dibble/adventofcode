@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 use std::env;
-mod day_12;
+mod day_10;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -10,7 +10,7 @@ fn main() {
     let filename = format!("./input/{}", &args[1]);
     // println!("{}", filename);
     if let Ok(lines) = read_lines(filename) {
-        day_12::run(lines);
+        day_10::run(lines);
     } else {
       println!("file read fail");
     }
