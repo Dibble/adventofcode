@@ -18,7 +18,7 @@ def findWordNumber(text):
                 lastNumber = [lastIndex, str(i+1)]
     
     # correct lastNumberIndex
-    print(text, lastNumber)
+    # print(text, lastNumber)
     correctLastNumber = [len(text) - lastNumber[0] - len(numbers[int(lastNumber[1])-1]), lastNumber[1]] if lastNumber != None else None
     
     return [firstNumber, correctLastNumber]
@@ -95,7 +95,7 @@ for line in f.readlines():
     combined = first + last
     toAdd = int(combined)
     # print(toAdd) if toAdd > 99 else None
-    print(l, combined)
+    # print(l, combined)
     sum += toAdd
 
 print(sum)
