@@ -1,5 +1,5 @@
-# f = open('test.txt', 'r')
-f = open('input.txt', 'r')
+f = open('test.txt', 'r')
+# f = open('input.txt', 'r')
 
 seeds = []
 maps = [] # [source, destination, [rules]], rules = [destination start, source start, range]
@@ -17,10 +17,10 @@ for line in f.readlines():
             # part 2
             seedIndex = -1
             while len(seedStrs) > 0:
-                print(f'seedStrs: {seedStrs}')
+                # print(f'seedStrs: {seedStrs}')
                 seedIndex = seedStrs.pop(0)
                 seedRange = seedStrs.pop(0)
-                seeds.append(int(seedIndex), int(seedRange))
+                seeds.append((int(seedIndex), int(seedRange)))
         case [*rule, 'map:']:
             if currentMap != []:
                 maps.append(currentMap)
@@ -56,3 +56,34 @@ if currentMap != []:
 # part 2
 # find lowest possible result value
 # travel backwards through maps
+# iterate over ranges
+# for each map rule, identify overlapping ranges and transform into multiple ranges
+# keep lowest value after processing each range
+for seed in seeds:
+    print(f'seed: {seed}')
+    transformedRanges = [seed]
+    for map in maps:
+        print(f'map: {map}')
+        mappedRanges = []
+        r = 0
+        while r < len(map[2]):
+            print(f'rule: {map[2][r]}')
+            [destinationStart, sourceStart, range] = map[2][r]
+            for transformedRange in transformedRanges:
+                print(f'transformedRange: {transformedRange}')
+                if sourceStart <= transformedRange[0] < sourceStart + range:
+                    print('seed range overlaps rule range')
+                    overlapRange = min(destinationStart + range, transformedRange[0] + transformedRange[1])
+                    mappedRanges.append((destinationStart, overlapRange - destinationStart))
+                    # before mapped range
+                    if transformedRange[0] < sourceStart:
+                        print('before mapped range')
+                        mappedRanges.append((transformedRange[0], sourceStart - transformedRange[0]))
+                    # after mapped range
+                    if destinationStart + overlapRange < transformedRange[0] + transformedRange[1]:
+                        print('after mapped range')
+                        mappedRanges.append((destinationStart + overlapRange, transformedRange[0] + transformedRange[1] - destinationStart - overlapRange))
+            r += 1
+        transformedRanges = mappedRanges
+    print(f'seed: {seed}, transformedRanges: {transformedRanges}')
+                
