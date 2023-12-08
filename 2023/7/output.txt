@@ -1,0 +1,11 @@
+[('32T3K', '765'), ('T55J5', '684'), ('KK677', '28'), ('KTJJT', '220'), ('QQQJA', '483')]
+score T55J5 beats 32T3K
+score KK677 loses T55J5
+score KK677 loses T55J5
+score KK677 beats 32T3K
+score KTJJT beats KK677
+card KTJJT beats T55J5: 0
+card QQQJA beats T55J5: 0
+card QQQJA loses KTJJT: 0
+['32T3K', 'KK677', 'T55J5', 'QQQJA', 'KTJJT']
+5905
