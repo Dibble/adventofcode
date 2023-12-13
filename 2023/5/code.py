@@ -57,8 +57,10 @@ if currentMap != []:
 # find lowest possible result value
 # travel backwards through maps
 # iterate over ranges
+
 # for each map rule, identify overlapping ranges and transform into multiple ranges
 # keep lowest value after processing each range
+print(seeds)
 for seed in seeds:
     print(f'seed: {seed}')
     transformedRanges = [seed]
@@ -87,3 +89,18 @@ for seed in seeds:
         transformedRanges = mappedRanges
     print(f'seed: {seed}, transformedRanges: {transformedRanges}')
                 
+
+# each seed range (79, 14)
+for seed in seeds:
+# each map transform to new set of ranges
+    newRanges = []
+    for map in maps:
+        mappedRanges = []
+# find overlapping rules
+        for rule in map[2]:
+            [destinationStart, sourceStart, range] = rule
+            if sourceStart <= seed[0] < sourceStart + range:
+                
+# for each overlapping rule, produce new ranges
+# repeat until no more maps/rules
+# find lowest value in ranges
