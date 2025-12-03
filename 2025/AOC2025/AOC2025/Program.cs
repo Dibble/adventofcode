@@ -2,6 +2,7 @@
 {
     { "1", Day1 },
     { "2", Day2 },
+    { "3", Day3 },
 };
 
 while (true)
@@ -15,6 +16,61 @@ while (true)
 
     Console.WriteLine("Finished");
     Console.ReadLine();
+}
+
+void Day3(IEnumerable<string> lines)
+{
+    var joltage = 0L;
+
+    foreach (var line in lines)
+    {
+        /* part 1 */
+        //var max = 0;
+        //var maxIdx = -1;
+        //for (var i = 0; i < line.Length - 1; i++)
+        //{
+        //    var num = int.Parse(line[i].ToString());
+        //    if (num > max)
+        //    {
+        //        max = num;
+        //        maxIdx = i;
+        //    }
+        //}
+
+        //var bmax = 0;
+        //for (var i = maxIdx + 1; i < line.Length; i++)
+        //{
+        //    var num = int.Parse(line[i].ToString());
+        //    if (num > bmax)
+        //    {
+        //        bmax = num;
+        //    }
+        //}
+
+        //joltage += int.Parse($"{max}{bmax}");
+
+        /* part 2 */
+        var digits = new List<char>();
+        var idx = -1;
+        for (var i = 11; i >= 0; i--)
+        {
+            var max = 0;
+            for (var j = idx + 1; j < line.Length - i; j++)
+            {
+                var num = int.Parse(line[j].ToString());
+                if (num > max)
+                {
+                    max = num;
+                    idx = j;
+                }
+            }
+            digits.Add(char.Parse(max.ToString()));
+        }
+        Console.WriteLine(new string(digits.ToArray()));
+        joltage += long.Parse(new string(digits.ToArray()));
+    }
+
+    Console.WriteLine(joltage);
 }
 
 void Day2(IEnumerable<string> lines)
