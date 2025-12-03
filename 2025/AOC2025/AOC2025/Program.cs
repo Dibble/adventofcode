@@ -157,26 +157,16 @@ void Day1(IEnumerable<string> lines)
 
         /* part 2 */
         // 6469 too high
-        while (steps > 100)
+        while (steps > 0)
         {
-            steps -= 100;
-            zeroes++;
-        }
+            position += direction == "R" ? 1 : -1;
+            
+            if (position == -1) position = 99;
+            else if (position == 100) position = 0;
 
-        position += direction == "R" ? steps : -steps;
-        if (position < 0)
-        {
-            position += 100;
-            zeroes++;
-        }
-        else if (position > 99)
-        {
-            position -= 100;
-            zeroes++;
-        }
-        else if (position == 0)
-        {
-            zeroes++;
+            if (position == 0) zeroes++;
+
+            steps--;
         }
 
         Console.WriteLine($"{position} {zeroes}");
