@@ -1,6 +1,7 @@
 ﻿var methods = new Dictionary<string, Action<IEnumerable<string>>>
 {
-    { "1", Day1 }
+    { "1", Day1 },
+    { "2", Day2 },
 };
 
 while (true)
@@ -14,6 +15,69 @@ while (true)
 
     Console.WriteLine("Finished");
     Console.ReadLine();
+}
+
+void Day2(IEnumerable<string> lines)
+{
+    var ranges = lines.First().Split(',');
+    var invalidIds = new List<long>();
+
+    foreach (var range in ranges)
+    {
+        var split = range.Split('-');
+        var start = long.Parse(split[0]);
+        var end = long.Parse(split[1]);
+
+        /* part 1 */
+        //for (var i = start; i <= end; i++)
+        //{
+        //    var str = i.ToString();
+        //    var left = str[..(str.Length/2)];
+        //    var right = str[(str.Length/2)..];
+
+        //    //Console.WriteLine($"{left} {right}");
+        //    if (left == right)
+        //    {
+        //        invalidIds.Add(i);
+        //    }
+        //}
+
+        /* part 2 */
+        for (var i = start; i <= end; i++)
+        {
+            var str = i.ToString();
+            for (var j = 1; j <= str.Length / 2; j++)
+            {
+                var invalid = false;
+                var lastChunk = string.Empty;
+                for (var k = 0; k < str.Length; k += j)
+                {
+                    var next = str.Substring(k, Math.Min(j, str.Length - k));
+                    if (lastChunk != string.Empty && next != lastChunk)
+                    {
+                        break;
+                    }
+
+                    lastChunk = next;
+
+                    if (k == str.Length - j)
+                    {
+                        invalid = true;
+                        break;
+                    }
+                }
+
+                if (invalid)
+                {
+                    //Console.WriteLine($"invalid {i}");
+                    invalidIds.Add(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    Console.WriteLine($"{invalidIds.Sum()}");
 }
 
 void Day1(IEnumerable<string> lines)
