@@ -3,6 +3,7 @@
     { "1", Day1 },
     { "2", Day2 },
     { "3", Day3 },
+    { "4", Day4 },
 };
 
 while (true)
@@ -16,6 +17,71 @@ while (true)
 
     Console.WriteLine("Finished");
     Console.ReadLine();
+}
+
+void Day4(IEnumerable<string> lines)
+{
+    /* part 1 */
+    //var accessible = 0;
+
+    //var grid = lines.Select(l => l.Select(c => c == '@').ToArray()).ToArray();
+    //for (var x = 0; x < grid[0].Length; x++)
+    //{
+    //    for (var y = 0; y < grid.Length; y++)
+    //    {
+    //        var surrounding = 0;
+    //        // get all surrounding positions
+    //        for (var i = x - 1; i <= x + 1; i++)
+    //        {
+    //            for (var j = y - 1; j <= y + 1; j++)
+    //            {
+    //                if (i == x && j == y) continue;
+    //                if (i < 0 || i >= grid[0].Length || j < 0 || j >= grid.Length) continue;
+    //                if (grid[j][i]) surrounding++;
+    //            }
+    //        }
+    //        // count how many are true
+    //        // increment accessible if less than 4
+    //        if (grid[y][x] && surrounding < 4) accessible++;
+    //        Console.WriteLine($"{x},{y}: {grid[y][x]} {surrounding}");
+    //    }
+    //}
+
+    //Console.WriteLine(accessible);
+
+    var total = 0;
+    var grid = lines.Select(l => l.Select(c => c == '@').ToArray()).ToArray();
+    while (true)
+    {
+        var accessible = new List<(int, int)>();
+        for (var x = 0; x < grid[0].Length; x++)
+        {
+            for (var y = 0; y < grid.Length; y++)
+            {
+                var surrounding = 0;
+                // get all surrounding positions
+                for (var i = x - 1; i <= x + 1; i++)
+                {
+                    for (var j = y - 1; j <= y + 1; j++)
+                    {
+                        if (i == x && j == y) continue;
+                        if (i < 0 || i >= grid[0].Length || j < 0 || j >= grid.Length) continue;
+                        if (grid[i][j]) surrounding++;
+                    }
+                }
+
+                // count how many are true
+                // increment accessible if less than 4
+                if (grid[x][y] && surrounding < 4) accessible.Add((x, y));
+            }
+        }
+
+        if (accessible.Count == 0) break;
+        total += accessible.Count;
+        accessible.ForEach((tuple => grid[tuple.Item1][tuple.Item2] = false));
+    }
+
+    Console.WriteLine(total);
 }
 
 void Day3(IEnumerable<string> lines)
