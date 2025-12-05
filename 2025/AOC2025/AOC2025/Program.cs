@@ -4,6 +4,7 @@
     { "2", Day2 },
     { "3", Day3 },
     { "4", Day4 },
+    { "5", Day5 },
 };
 
 while (true)
@@ -17,6 +18,86 @@ while (true)
 
     Console.WriteLine("Finished");
     Console.ReadLine();
+}
+
+void Day5(IEnumerable<string> lines)
+{
+    /* part 1 */
+    //var ranges = new List<(long, long)>();
+    //var fresh = 0;
+
+    //var x = false;
+    //foreach (var line in lines)
+    //{
+    //    if (string.IsNullOrWhiteSpace(line))
+    //    {
+    //        x = true;
+    //        continue;
+    //    }
+
+    //    if (x)
+    //    {
+    //        var num = long.Parse(line);
+    //        foreach (var range in ranges)
+    //        {
+    //            if (num >= range.Item1 && num <= range.Item2)
+    //            {
+    //                fresh++;
+    //                break;
+    //            }
+    //        }
+    //    }
+    //    else
+    //    {
+    //        var split = line.Split('-');
+    //        var start = long.Parse(split[0]);
+    //        var end = long.Parse(split[1]);
+    //        ranges.Add((start, end));
+    //    }
+    //}
+
+    //Console.WriteLine(fresh);
+
+    /* part 2 */
+    var ranges = new List<(long, long)>();
+    foreach (var line in lines)
+    {
+        if (string.IsNullOrWhiteSpace(line)) break;
+
+        var split = line.Split('-');
+        var start = long.Parse(split[0]);
+        var end = long.Parse(split[1]);
+        ranges.Add((start, end));
+    }
+
+    ranges = ranges.OrderBy(r => r.Item1).ToList();
+    var merged = new List<(long, long)>();
+    foreach (var range in ranges)
+    {
+        if (merged.Count == 0)
+        {
+            merged.Add(range);
+        }
+        else
+        {
+            var last = merged.Last();
+            if (range.Item1 <= last.Item2 + 1)
+            {
+                merged[^1] = (last.Item1, Math.Max(last.Item2, range.Item2));
+            }
+            else
+            {
+                merged.Add(range);
+            }
+        }
+    }
+
+    var total = 0L;
+    foreach (var merge in merged)
+    {
+        total += merge.Item2 - merge.Item1 + 1;
+    }
+    Console.WriteLine(total);
 }
 
 void Day4(IEnumerable<string> lines)
