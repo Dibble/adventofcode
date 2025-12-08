@@ -5,6 +5,7 @@
     { "3", Day3 },
     { "4", Day4 },
     { "5", Day5 },
+    { "6", Day6 },
 };
 
 while (true)
@@ -18,6 +19,111 @@ while (true)
 
     Console.WriteLine("Finished");
     Console.ReadLine();
+}
+
+void Day6(IEnumerable<string> lines)
+{
+    var total = 0L;
+
+    /* part 1 */
+    //var problems = new List<List<long>>();
+    //foreach (var line in lines)
+    //{
+    //    var x = line.Replace("  ", " ");
+    //    while (x.Contains("  "))
+    //    {
+    //        x = x.Replace("  ", " ");
+    //    }
+
+    //    x = x.Trim();
+
+    //    var split = x.Split(' ');
+
+    //    for (var i = 0; i < split.Length; i++)
+    //    {
+    //        if (problems.Count <= i)
+    //        {
+    //            problems.Add([]);
+    //        }
+
+    //        switch (split[i])
+    //        {
+    //            case "*":
+    //                var solution = problems[i].Aggregate(1L, (acc, x) => acc * x);
+    //                Console.WriteLine(solution);
+    //                total += solution;
+    //                break;
+    //            case "+":
+    //                solution = problems[i].Sum();
+    //                Console.WriteLine(solution);
+    //                total += solution;
+    //                break;
+    //            default:
+    //                problems[i].Add(int.Parse(split[i]));
+    //                break;
+    //        }
+    //    }
+    //}
+
+    /* part 2*/
+    var columns = new List<int>();
+    for (var i = 1; i < lines.Last().Length; i++)
+    {
+        if (lines.Last()[i] != ' ')
+        {
+            columns.Add(i - 1);
+        }
+    }
+
+    var problems = new List<List<string>>();
+    foreach (var line in lines)
+    {
+        var problem = 0;
+        var num = 0;
+        for (var i = line.Length - 1; i >= 0; i--)
+        {
+            if (columns.Contains(i))
+            {
+                problem++;
+                num = 0;
+                continue;
+            }
+
+            if (problems.Count <= problem)
+            {
+                problems.Add([]);
+            }
+
+            if (problems[problem].Count <= num)
+            {
+                problems[problem].Add(string.Empty);
+            }
+
+            switch (line[i])
+            {
+                case '*':
+                    var solution = problems[problem].Aggregate(1L, (acc, x) => acc * long.Parse(x.TrimEnd('0')));
+                    Console.WriteLine(solution);
+                    total += solution;
+                    break;
+                case '+':
+                    solution = problems[problem].Sum(x => long.Parse(x.TrimEnd('0')));
+                    Console.WriteLine(solution);
+                    total += solution;
+                    break;
+                case ' ':
+                    problems[problem][num] += "0";
+                    break;
+                default:
+                    problems[problem][num] += line[i].ToString();
+                    break;
+            }
+
+            num++;
+        }
+    }
+
+    Console.WriteLine(total);
 }
 
 void Day5(IEnumerable<string> lines)
