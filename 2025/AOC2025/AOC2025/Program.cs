@@ -6,6 +6,7 @@
     { "4", Day4 },
     { "5", Day5 },
     { "6", Day6 },
+    { "7", Day7 },
 };
 
 while (true)
@@ -19,6 +20,96 @@ while (true)
 
     Console.WriteLine("Finished");
     Console.ReadLine();
+}
+
+void Day7(IEnumerable<string> lines)
+{
+    var (grid, positions) = ParseGrid(lines, "S", "^");
+    Console.WriteLine($"Total splitters: {positions[1].Count}");
+
+    /* part 1 */
+    //var activated = new HashSet<(int, int)>();
+    //var active = new HashSet<int>
+    //{
+    //    positions[0].First().Item1
+    //};
+
+    //var y = 0;
+    //while (y < grid.GetLength(1))
+    //{
+    //    var nextActive = new HashSet<int>();
+    //    y++;
+
+    //    foreach (var act in active)
+    //    {
+    //        Console.WriteLine($"{act}, {y}");
+    //        if (act == 0 || act == grid.GetLength(0))
+    //        {
+    //            continue;
+    //        }
+
+    //        var next = (act, y);
+    //        if (positions[1].Contains(next) && !activated.Contains(next))
+    //        {
+    //            activated.Add(next);
+    //            if (act > 0) nextActive.Add(act - 1);
+    //            if (act < grid.GetLength(0) - 1) nextActive.Add(act + 1);
+    //            continue;
+    //        }
+
+    //        nextActive.Add(act);
+    //    }
+
+    //    active = nextActive;
+    //}
+
+    //Console.WriteLine(activated.Count);
+
+    /* part 2 */
+    var activated = new Dictionary<(int, int), int>();
+    var active = new HashSet<int>
+    {
+        positions[0].First().Item1
+    };
+
+    var y = 0;
+    while (y < grid.GetLength(1))
+    {
+        var nextActive = new HashSet<int>();
+        y++;
+
+        foreach (var act in active)
+        {
+            Console.WriteLine($"{act}, {y}");
+            if (act == 0 || act == grid.GetLength(0))
+            {
+                continue;
+            }
+
+            var next = (act, y);
+            if (positions[1].Contains(next))
+            {
+                if (activated.ContainsKey(next))
+                {
+                    activated[next]++;
+                }
+                else
+                {
+                    activated[next] = 1;
+                    if (act > 0) nextActive.Add(act - 1);
+                    if (act < grid.GetLength(0) - 1) nextActive.Add(act + 1);
+                    continue;
+                }
+            }
+
+            nextActive.Add(act);
+        }
+
+        active = nextActive;
+    }
+
+    Console.WriteLine(activated.Values.Sum());
+    var timelines = activated.Values.Aggregate(1, (next, acc) => )
 }
 
 void Day6(IEnumerable<string> lines)
@@ -424,4 +515,29 @@ void Day1(IEnumerable<string> lines)
 
         Console.WriteLine($"{position} {zeroes}");
     }
+}
+
+(char[,], List<List<(int,int)>>) ParseGrid(IEnumerable<string> lines, params string[] keys)
+{
+    var grid = new char[lines.First().Length,lines.Count()];
+    var positions = new List<List<(int, int)>>();
+    foreach (var key in keys)
+    {
+        positions.Add(new List<(int, int)>());
+    }
+
+    foreach (var (line, y) in lines.Select((value, index) => (value, index)))
+    {
+        foreach (var (c, x) in line.Select((value, index) => (value, index)))
+        {
+            grid[x, y] = c;
+            var idx = keys.IndexOf<string>(c.ToString());
+            if (idx != -1)
+            {
+                positions[idx].Add((x, y));
+            }
+        }
+    }
+
+    return (grid, positions);
 }
