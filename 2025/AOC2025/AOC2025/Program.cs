@@ -7,6 +7,7 @@
     { "5", Day5 },
     { "6", Day6 },
     { "7", Day7 },
+    { "8", Day8 },
 };
 
 while (true)
@@ -20,6 +21,107 @@ while (true)
 
     Console.WriteLine("Finished");
     Console.ReadLine();
+}
+
+void Day8(IEnumerable<string> lines)
+{
+    var boxes = lines.Select(l => l.Split(',').Select(int.Parse).ToArray()).ToArray();
+    var distances = new Dictionary<double, (int, int)>();
+
+    for (var i = 0; i < boxes.Length - 1; i++)
+    {
+        for (var j = i + 1; j < boxes.Length; j++)
+        {
+            distances.Add(Math.Sqrt(Math.Pow(boxes[j][0] - boxes[i][0], 2) + Math.Pow(boxes[j][1] - boxes[i][1], 2) + Math.Pow(boxes[j][2] - boxes[i][2], 2)), (i, j));
+        }
+    }
+
+    var sortedDistances = distances.Keys.ToArray();
+    sortedDistances.Sort();
+
+    /* part 1 */
+    //var connectedPairs = sortedDistances.Take(10).Select(d => distances[d]);
+    //var connectedPairs = sortedDistances.Take(1000).Select(d => distances[d]);
+    //Console.WriteLine(string.Join('\n', connectedPairs.Select(p => $"{boxes[p.Item1][0]},{boxes[p.Item1][1]},{boxes[p.Item1][2]}({p.Item1}) {boxes[p.Item2][0]},{boxes[p.Item2][1]},{boxes[p.Item2][2]}({p.Item2})")));
+
+    //var circuits = new List<List<int>>();
+    //foreach (var pair in connectedPairs)
+    //{
+    //    var first = circuits.FirstOrDefault(c => c.Contains(pair.Item1));
+    //    var second = circuits.FirstOrDefault(c => c.Contains(pair.Item2));
+
+    //    if (first == null && second == null)
+    //    {
+    //        circuits.Add(new List<int>
+    //        {
+    //            pair.Item1, pair.Item2
+    //        });
+    //    }
+    //    else if (first == null)
+    //    {
+    //        second!.Add(pair.Item1);
+    //    }
+    //    else if (second == null)
+    //    {
+    //        first!.Add(pair.Item2);
+    //    }
+    //    else if (first == second)
+    //    {
+    //        continue;
+    //    }
+    //    else
+    //    {
+    //        first.AddRange(second);
+    //        circuits.Remove(second);
+    //    }
+    //}
+
+    //Console.WriteLine(string.Join('\n', circuits.Select(c => $"{string.Join(',', c)} ({c.Count})")));
+
+    //var circuitSizes = circuits.Select(c => c.Count).ToArray();
+    //circuitSizes.Sort();
+
+    //Console.WriteLine(circuitSizes.TakeLast(3).Aggregate(1, (acc, next) => acc * next));
+
+    /* part 2 */
+    var circuits = new List<List<int>>();
+    var wallDistance = 0L;
+    foreach (var pair in sortedDistances.Select(d => distances[d]))
+    {
+        var first = circuits.FirstOrDefault(c => c.Contains(pair.Item1));
+        var second = circuits.FirstOrDefault(c => c.Contains(pair.Item2));
+
+        if (first == null && second == null)
+        {
+            wallDistance = (long)boxes[pair.Item1][0] * (long)boxes[pair.Item2][0];
+            circuits.Add(new List<int>
+            {
+                pair.Item1, pair.Item2
+            });
+        }
+        else if (first == null)
+        {
+            wallDistance = (long)boxes[pair.Item1][0] * (long)boxes[pair.Item2][0];
+            second!.Add(pair.Item1);
+        }
+        else if (second == null)
+        {
+            wallDistance = (long)boxes[pair.Item1][0] * (long)boxes[pair.Item2][0];
+            first!.Add(pair.Item2);
+        }
+        else if (first == second)
+        {
+            continue;
+        }
+        else
+        {
+            wallDistance = (long)boxes[pair.Item1][0] * (long)boxes[pair.Item2][0];
+            first.AddRange(second);
+            circuits.Remove(second);
+        }
+    }
+
+    Console.WriteLine(wallDistance);
 }
 
 void Day7(IEnumerable<string> lines)
@@ -109,7 +211,7 @@ void Day7(IEnumerable<string> lines)
     }
 
     Console.WriteLine(activated.Values.Sum());
-    var timelines = activated.Values.Aggregate(1, (next, acc) => )
+    //var timelines = activated.Values.Aggregate(1, (next, acc) => )
 }
 
 void Day6(IEnumerable<string> lines)
