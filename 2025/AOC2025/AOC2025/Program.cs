@@ -8,6 +8,7 @@
     { "6", Day6 },
     { "7", Day7 },
     { "8", Day8 },
+    { "9", Day9 },
 };
 
 while (true)
@@ -21,6 +22,26 @@ while (true)
 
     Console.WriteLine("Finished");
     Console.ReadLine();
+}
+
+void Day9(IEnumerable<string> lines)
+{
+    var tiles = lines.Select(l => l.Split(',').Select(int.Parse).ToArray()).ToArray();
+
+    var largest = 0L;
+    for (var i = 0; i < tiles.Length - 1; i++)
+    {
+        for (var j = i + 1; j < tiles.Length; j++)
+        {
+            var area = (Math.Abs(tiles[i][0] - tiles[j][0]) + 1L) * (Math.Abs(tiles[i][1] - tiles[j][1]) + 1L);
+            if (area > largest)
+            {
+                largest = area;
+            }
+        }
+    }
+
+    Console.WriteLine(largest);
 }
 
 void Day8(IEnumerable<string> lines)
