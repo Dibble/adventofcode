@@ -9,6 +9,7 @@
     { "7", Day7 },
     { "8", Day8 },
     { "9", Day9 },
+    { "10", Day10 },
 };
 
 while (true)
@@ -22,6 +23,57 @@ while (true)
 
     Console.WriteLine("Finished");
     Console.ReadLine();
+}
+
+void Day10(IEnumerable<string> lines)
+{
+    var total = 0;
+    foreach (var line in lines)
+    {
+        var split = line.Split(' ');
+        var target = split[0].Trim('[',']').Select(x => x == '#').ToArray();
+        var buttons = split[1..^1].Select(x => x.Trim('(', ')').Split(',').Select(int.Parse).ToArray()).ToArray();
+        
+        var paths = buttons.Select((b, idx) => (new List<int> {idx}, new bool[target.Length].Select((_, j) => b.Contains(j)).ToArray())).ToList();
+
+        var found = false;
+        while (!found)
+        {
+            var newPaths = new List<(List<int>, bool[])>();
+            foreach (var path in paths)
+            {
+                if (path.Item2.SequenceEqual(target))
+                {
+                    Console.WriteLine($"solved: {path.Item1.Count} presses ({string.Join(',', path.Item1)})");
+                    found = true;
+                    total += path.Item1.Count;
+                    break;
+                }
+                if (found) break;
+                
+                for (var b = 0; b < buttons.Length; b++)
+                {
+                    if (path.Item1.Last() == b) continue;
+
+                    List<int> newPath = [.. path.Item1, b];
+                    var newState = path.Item2.Select((c, idx) => buttons[b].Contains(idx) ? !c : c).ToArray();
+
+                    if (newState.SequenceEqual(target))
+                    {
+                        Console.WriteLine($"solved: {newPath.Count} presses ({string.Join(',',newPath)})");
+                        total += newPath.Count;
+                        found = true;
+                        break;
+                    }
+                    newPaths.Add((newPath, newState));
+                }
+            }
+
+            paths = newPaths;
+        }
+    }
+    Console.WriteLine(total);
+    // 378 too high
 }
 
 void Day9(IEnumerable<string> lines)
